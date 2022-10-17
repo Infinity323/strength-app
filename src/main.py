@@ -22,7 +22,7 @@ kv = Builder.load_file("StrengthApp.kv")
 
 class StrengthApp(App):
     def build(self):
-        self.icon = "data/icon.png"
+        self.icon = "images/icon.png"
         return kv
 
 if __name__ == "__main__":

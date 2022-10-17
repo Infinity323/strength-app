@@ -30,6 +30,8 @@ class NippardStrengthStandardScreen(Screen):
     b_progress = StringProperty("0")
     d_progress = StringProperty("0")
 
+    dots = 0
+
     def update(self):
         self.s_level_name = self.rankings[self.s_level]
         self.b_level_name = self.rankings[self.b_level]
@@ -43,14 +45,15 @@ class NippardStrengthStandardScreen(Screen):
         return
 
     def progress(self):
-        if self.g is "m":
+        if self.g == "m":
             self.s_div = [0, 45, 135, 1.25*self.bw, 1.75*self.bw, 2.5*self.bw, 3*self.bw, MAX_WEIGHT]
             self.b_div = [0, 45, 95, self.bw, 1.5*self.bw, 2*self.bw, 2.25*self.bw, MAX_WEIGHT]
             self.d_div = [0, 45, 135, 1.5*self.bw, 2.25*self.bw, 3*self.bw, 3.5*self.bw, MAX_WEIGHT]
-        else:
+        elif self.g == "f":
             self.s_div = [0, 45, 95, self.bw, 1.5*self.bw, 1.75*self.bw, 2.25*self.bw, MAX_WEIGHT]
             self.b_div = [0, 0, 45, 0.5*self.bw, 0.75*self.bw, self.bw, 1.25*self.bw, MAX_WEIGHT]
             self.d_div = [0, 45, 135, 1.25*self.bw, 1.75*self.bw, 2.25*self.bw, 3*self.bw, MAX_WEIGHT]
+
         low = self.s_div[self.s_level]
         high = self.s_div[self.s_level+1]
         self.s_progress = str((self.s - low)/(high - low))
@@ -60,6 +63,24 @@ class NippardStrengthStandardScreen(Screen):
         low = self.d_div[self.d_level]
         high = self.d_div[self.d_level+1]
         self.d_progress = str((self.d - low)/(high - low))
+
+        return
+
+    def calculateDOTS(self):
+        """Calculate DOTS for the lifter.
+        https://github.com/perlinlim/liftercalc/blob/master/main.tsx
+        """
+        denominator = 0
+        coefficients = []
+        if self.g == "m":
+            denominator = -307.75076
+            coefficients = [24.0900756, -0.1918759221, 0.0007391293, -0.000001093]
+        elif self.g == "f":
+            denominator = -57.96288
+            coefficients = [13.6175032, -0.1126655495, 0.0005158568, -0.0000010706]
+        for i in range(1, len(coefficients)):
+            denominator += coefficients[i] * self.bw**i
+        self.dots = (500 / denominator) * self.total
 
         return
 
@@ -88,9 +109,6 @@ class NippardStrengthStandardScreen(Screen):
         elif self.d >= 3*self.bw and self.d < 3.5*self.bw: self.d_level = 5
         else: self.d_level = 6
 
-        self.update()
-        self.progress()
-
         return
 
     def classifyFemale(self):
@@ -117,9 +135,6 @@ class NippardStrengthStandardScreen(Screen):
         elif self.d >= 2.25*self.bw and self.d < 3*self.bw: self.d_level = 5
         else: self.d_level = 6
 
-        self.update()
-        self.progress()
-
         return
 
     def calculate(self):
@@ -133,6 +148,10 @@ class NippardStrengthStandardScreen(Screen):
         else:
             self.g = "f"
             self.classifyFemale()
+
+        self.update()
+        self.progress()
+
         return
 
     def __init__(self, **kwargs):
