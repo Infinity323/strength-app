@@ -2,9 +2,16 @@ from kivy.uix.screenmanager import Screen
 from kivy.properties import StringProperty
 
 class ORMPredictorScreen(Screen):
+    """The 1RM predictor screen.
+
+    Args:
+        Screen (kivy.uix.screenmanager.Screen): A kivy Screen object.
+    """
     e = StringProperty("0")
 
     def estimate(self):
+        """Fill estimation values.
+        """
         w = float(self.ids.weight.text)
         r = int(self.ids.reps.text)
         if (r == 1): p = 1
@@ -23,6 +30,8 @@ class ORMPredictorScreen(Screen):
         return
 
     def __init__(self, **kwargs):
+        """Init function.
+        """
         super().__init__(**kwargs)
         
         

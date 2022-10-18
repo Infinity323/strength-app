@@ -2,6 +2,11 @@ from kivy.uix.screenmanager import Screen
 from kivy.properties import StringProperty
 
 class PoundsBreakdownScreen(Screen):
+    """The pounds plates breakdown screen.
+
+    Args:
+        Screen (kivy.uix.screenmanager.Screen): A kivy Screen object.
+    """
     weight = StringProperty("0")
 
     norm_one_side = 0
@@ -27,6 +32,8 @@ class PoundsBreakdownScreen(Screen):
     comp_half = StringProperty("0")
 
     def pounds(self):
+        """Breakdown the weight in pounds without 55 or 35 lb plates.
+        """
         w = round(float(self.ids.weight.text))
         self.weight = str(w)
         self.norm_one_side = (w - 45)/2
@@ -49,6 +56,8 @@ class PoundsBreakdownScreen(Screen):
         return
 
     def compPounds(self):
+        """Breakdown the weight in pounds with all plates.
+        """
         w = round(float(self.ids.weight.text))
         self.weight = str(w)
         self.comp_one_side = (w - 45)/2
@@ -73,4 +82,6 @@ class PoundsBreakdownScreen(Screen):
         return
 
     def __init__(self, **kwargs):
+        """Init function.
+        """
         super().__init__(**kwargs)
