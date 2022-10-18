@@ -4,6 +4,11 @@ from kivy.properties import StringProperty
 MAX_WEIGHT = 2000
 
 class NippardStrengthStandardScreen(Screen):
+    """The Jeff Nippard strength standard calculation screen.
+
+    Args:
+        Screen (kivy.uix.screenmanager.Screen): A kivy Screen object.
+    """
     # "Enumerate" strength category names
     rankings = ["Crippled", "Noob", "Beginner", "Intermediate", "Advanced", "Elite", "Freak"]
     s_div = []
@@ -30,9 +35,11 @@ class NippardStrengthStandardScreen(Screen):
     b_progress = StringProperty("0")
     d_progress = StringProperty("0")
 
-    dots = 0
+    dots = StringProperty("0")
 
     def update(self):
+        """Update the lifter's screen values.
+        """
         self.s_level_name = self.rankings[self.s_level]
         self.b_level_name = self.rankings[self.b_level]
         self.d_level_name = self.rankings[self.d_level]
@@ -45,6 +52,8 @@ class NippardStrengthStandardScreen(Screen):
         return
 
     def progress(self):
+        """Calculate progression for the lifter in the competition lifts.
+        """
         if self.g == "m":
             self.s_div = [0, 45, 135, 1.25*self.bw, 1.75*self.bw, 2.5*self.bw, 3*self.bw, MAX_WEIGHT]
             self.b_div = [0, 45, 95, self.bw, 1.5*self.bw, 2*self.bw, 2.25*self.bw, MAX_WEIGHT]
@@ -54,6 +63,7 @@ class NippardStrengthStandardScreen(Screen):
             self.b_div = [0, 0, 45, 0.5*self.bw, 0.75*self.bw, self.bw, 1.25*self.bw, MAX_WEIGHT]
             self.d_div = [0, 45, 135, 1.25*self.bw, 1.75*self.bw, 2.25*self.bw, 3*self.bw, MAX_WEIGHT]
 
+        # Calculate the experience level of each lift
         low = self.s_div[self.s_level]
         high = self.s_div[self.s_level+1]
         self.s_progress = str((self.s - low)/(high - low))
@@ -72,19 +82,22 @@ class NippardStrengthStandardScreen(Screen):
         """
         denominator = 0
         coefficients = []
+        temp_bw = 0
         if self.g == "m":
-            denominator = -307.75076
-            coefficients = [24.0900756, -0.1918759221, 0.0007391293, -0.000001093]
+            coefficients = [-307.75076, 24.0900756, -0.1918759221, 0.0007391293, -0.0000010930]
+            temp_bw = 0.45359237*min(max(self.bw, 40.0), 210.0)
         elif self.g == "f":
-            denominator = -57.96288
-            coefficients = [13.6175032, -0.1126655495, 0.0005158568, -0.0000010706]
-        for i in range(1, len(coefficients)):
-            denominator += coefficients[i] * self.bw**i
-        self.dots = (500 / denominator) * self.total
+            coefficients = [-57.96288, 13.6175032, -0.1126655495, 0.0005158568, -0.0000010706]
+            temp_bw = 0.45359237*min(max(self.bw, 40.0), 150.0)
+        for i in range(len(coefficients)):
+            denominator += coefficients[i] * temp_bw**i
+        self.dots = str((500.0 / denominator) * 0.45359237*(self.s + self.b + self.d))
 
         return
 
     def classifyMale(self):
+        """Classify the competition lifts experience levels of a male lifter.
+        """
         if self.s < 45: self.s_level = 0
         elif self.s >= 45 and self.s < 135: self.s_level = 1
         elif self.s >= 135 and self.s < 1.25*self.bw: self.s_level = 2
@@ -112,6 +125,8 @@ class NippardStrengthStandardScreen(Screen):
         return
 
     def classifyFemale(self):
+        """Classify the competition lift experience level of a female lifter.
+        """
         if self.s < 45: self.s_level = 0
         elif self.s >= 45 and self.s < 95: self.s_level = 1
         elif self.s >= 95 and self.s < self.bw: self.s_level = 2
@@ -138,6 +153,8 @@ class NippardStrengthStandardScreen(Screen):
         return
 
     def calculate(self):
+        """Calls calculation functions.
+        """
         self.bw = float(self.ids.bw.text)
         self.s = float(self.ids.s.text)
         self.b = float(self.ids.b.text)
@@ -151,8 +168,11 @@ class NippardStrengthStandardScreen(Screen):
 
         self.update()
         self.progress()
+        self.calculateDOTS()
 
         return
 
     def __init__(self, **kwargs):
+        """Init function.
+        """
         super().__init__(**kwargs)

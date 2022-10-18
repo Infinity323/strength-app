@@ -16,7 +16,7 @@ MainMenu:
         pos_hint: {"center_x": 0.5, "center_y": 0.5}
         orientation: "vertical"
         Label:
-            text: "General Strength Application\n(ver 1.0.0)"
+            text: "General Strength Application\n(ver 1.1.0)"
             text_size: self.width, None
             halign: "center"
             bold: True
@@ -242,6 +242,10 @@ MainMenu:
         ProgressBar:
             value_normalized: float(root.d_progress)
             size_hint: 1, 0.1
+        Label:
+            text: "DOTS: " + str(round(float(root.dots),2))
+            bold: True
+            size_hint: 1, 0.1 
     Button:
         text: "Back"
         size: "60dp", "40dp"
